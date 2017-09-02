@@ -36,7 +36,9 @@ export PS1="[%n@%m] %(4~;../;)%3~:%(!.#.>) "
 # Make less case-insensitive 
 export LESS="-qeiFX"
 # add personal dirs to path
-pathmunge ~/bin
+if [ -d "~/bin" ]; then
+   pathmunge ~/bin
+fi
 
 
 ########################

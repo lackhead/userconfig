@@ -128,7 +128,7 @@ link_file () {
 #####################
 # PROCESS ARGUMENTS #
 #####################
-while getopts "bd:host" opt $@; do
+while getopts "Bd:hOSt" opt $@; do
   case "$opt" in
     b) backup_all="true" ;;
     d) DEST_HOME=$(echo ${OPTARG} | sed 's:/$::') ;;
@@ -136,15 +136,15 @@ while getopts "bd:host" opt $@; do
     s) skip_all="true" ;;
     t) TEST="true" ;;
     ?) echo ""
-       echo "Usage: $(basename $0) [ -ost ] [ -d <dir> ]"
+       echo "Usage: $(basename $0) [ -BOSt ] [ -d <dir> ]"
        echo ""
-       echo "   -b   Backup all files/links that currently exist"
+       echo "   -B   Backup all files/links that currently exist"
        echo "   -d   Install into <dir> instead of ${HOME}"
-       echo "   -o   overwrite all existing files without prompting"
-       echo "   -s   Skip any existing files"
+       echo "   -O   overwrite all existing files without prompting"
+       echo "   -S   Skip any existing files"
        echo "   -t   Test mode; show what would be done"
        echo ""
-       return 0
+       exit
        ;;
   esac
 done
