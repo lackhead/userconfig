@@ -29,6 +29,9 @@ echo "Setting general options"
 # Set a really fast key repeat.
 /usr/bin/defaults write NSGlobalDomain KeyRepeat -int 2
 
+# set shell to zsh
+/usr/bin/chsh -s /bin/zsh
+
 
 #######################################################
 # Time Machine.                                       #
