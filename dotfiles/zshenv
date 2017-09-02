@@ -1,0 +1,30 @@
+#########################################
+#                                       #
+# This is Chad Lake's .zshenv file:     #
+#                                       #
+# This file is executed by every shell  #
+# e.g.: aliases, path, env variables    #
+#                                       #
+#########################################
+
+
+###########
+# Aliases #
+###########
+
+alias pwds='gpg --decrypt ~clake/private/passes.gpg | less'
+alias h='history'
+alias ls='ls -F'
+alias rm='rm -i'
+# Mac specific stuff
+if [[ $(uname -s) == "Darwin" ]]; then
+   alias subl='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
+   alias update_mac_software='/usr/bin/sudo /usr/sbin/softwareupdate -ir --verbose'
+fi
+
+
+#################
+# Setting fpath #
+#################
+
+fpath=( $HOME/.zsh_functions "${fpath[@]}" )

@@ -1,0 +1,27 @@
+#
+# This is Chad Lake's .bash_profile file:
+#
+# This file is executed by every login shell, ie. when you
+# login on the console or telnet.  It is *not* executed when
+# you 'ssh <command>' to another machine.  
+#
+#
+
+
+ 
+# Run keychain 
+# kch=`type -p keychain`
+# if [ -n "$kch" ]; then
+#    $kch
+#   . ~/.keychain/`uname -n`-sh
+# fi
+  
+# Grab what you can from the bashrc
+# ONLY if it seems to have not run before 
+#   Note: Solaris for some reason doesn't source .bashrc on
+#         login, but the OS variable is set. Make sure we 
+#         source our .bashrc on solaris then. 
+if [ -f ~/.bashrc -a \( -z "$OS" -o "$OS" = "Solaris" \) ]; then
+  source ~clake/.bashrc
+fi 
+
