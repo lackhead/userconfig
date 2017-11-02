@@ -11,7 +11,6 @@
 ###########
 # Aliases #
 ###########
-
 alias pwds='gpg --decrypt ~clake/private/passes.gpg | less'
 alias h='history'
 alias ls='ls -F'
@@ -26,5 +25,20 @@ fi
 #################
 # Setting fpath #
 #################
+fpath=( $HOME/.zsh_functions $HOME/.zsh_completions "${fpath[@]}" )
 
-fpath=( $HOME/.zsh_functions "${fpath[@]}" )
+
+################################
+# Set up environment variables #
+################################
+# Make less case-insensitive
+export LESS="-qeiFX"
+
+# Tell git not to use my account creds for public repositories
+export HOMEBREW_NO_GITHUB_API=1
+
+# add personal dirs to path
+if [ -d "~/bin" ]; then
+   pathmunge ~/bin
+fi
+

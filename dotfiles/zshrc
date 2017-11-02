@@ -20,32 +20,39 @@ autoload -Uz kch
 autoload -Uz pathmunge
 
 
+##############
+# PATH stuff #
+##############
+for dir in ~/bin /usr/local/{s,}bin; do
+   if [[ -d $dir ]]; then
+      pathmunge $dir before
+   fi
+done
+
+
 ################
 # prompt stuff #
 ################
-
 autoload -U promptinit
 promptinit
 export PS1="[%n@%m] %(4~;../;)%3~:%(!.#.>) "
 
 
-################################
-# Set up environment variables #
-################################
-
-# Make less case-insensitive 
-export LESS="-qeiFX"
-# add personal dirs to path
-if [ -d "~/bin" ]; then
-   pathmunge ~/bin
-fi
-
-
 ########################
 # Command Line Editing #
 ########################
-
 # emacs style
-bindkey -e 
+bindkey -e
 
 
+##################
+# Autocompletion #
+##################
+autoload -U compinit
+compinit
+# matches case insensitive for lowercase
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# pasting with tabs doesn't perform completion
+zstyle ':completion:*' insert-tab pending
+# show completion menu when number of options is at least 2
+zstyle ':completion:*' menu select=2
