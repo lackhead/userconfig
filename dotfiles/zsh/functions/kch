@@ -1,0 +1,18 @@
+local kch=`type -p keychain`;
+if [ -n "$kch" ]; then
+    $kch --host $HOST;
+    if [ -f ~/.keychain/${HOST}-sh ]; then
+        echo "Sourcing ~/.keychain/${HOST}-sh...";
+        . ~/.keychain/${HOST}-sh;
+        for key in lackhead_rsa;
+        do
+            if ! ssh-add -l | grep -q $key; then
+                ssh-add $HOME/.ssh/$key;
+            fi;
+        done;
+    else
+        echo "No keychain host file found for $HOST.";
+    fi;
+else
+    echo "keychain script was not found!";
+fi

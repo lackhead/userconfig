@@ -1,0 +1,16 @@
+backup_dir="/Volumes/Long Term Storage/clake"
+
+# make sure destination dir exists
+if [ ! -d "${backup_dir}" ]; then
+   read -q "REPLY?Directory ${backup_dir} not found. Create it? [y/n]: "
+   echo
+   if [[ "${REPLY}" != 'y' ]]; then
+      return
+   fi
+   echo "Creating directory ${backup_dir}..."
+   /bin/mkdir -v "${backup_dir}"
+fi
+
+# make sure we're sync'd
+echo "Backing up to ${backup_dir}..."
+/usr/bin/rsync -avuxr --stats --delete-after --exclude "Library" --exclude "Music/iTunes" --exclude "Downloads" --exclude ".Trash" --exclude "Library/Caches" /Users/clake/ "${backup_dir}/"
