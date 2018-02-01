@@ -1,0 +1,105 @@
+
+function convmon ()
+{
+    mon=`echo $1 | sed 's/\(...\).*/\1/' | tr '[:upper:]' '[:lower:]'`;
+    case "$mon" in
+        "now") return `date +'%m' | sed 's/^0//'` ;;
+        "jan") return 1 ;;
+        "feb") return 2 ;;
+        "mar") return 3 ;;
+        "apr") return 4 ;;
+        "may") return 5 ;;
+        "jun") return 6 ;;
+        "jul") return 7 ;;
+        "aug") return 8 ;;
+        "sep") return 9 ;;
+        "oct") return 10 ;;
+        "nov") return 11 ;;
+        "dec") return 12 ;;
+    esac
+}
+
+# simplest case- no args
+if [ $# -eq 0 ]; then
+    /usr/bin/cal
+    return
+elif [ $# -eq 2 ]; then
+    # two args are month (month range) and year
+    # easy to know what is what
+    month=$1
+    year=$2
+elif [ $# -eq 1 ]; then
+    # a single arg is a month range (presence of -)
+    # or a month (string or number <= 12)
+    # or a year (any other number)
+    arg=$1
+    # if it is all numbers, then pick between month (<=12) or year
+    if [[ "$arg" =~ "^[0-9]+$" ]]; then
+        if [ "$arg" -le "12" ]; then
+            month=$arg
+            year=`date +'%Y'`
+        else
+            # easy case, just a year
+            /usr/bin/cal $arg
+            return
+        fi
+    else
+        # anything besides numbers is a month
+        month=$arg
+        year=`date +'%Y'`
+    fi
+else
+    echo "Usage: $0 [ month ] [ year ]"
+    return
+fi
+
+# can specify month as:
+#   - month number or name
+#   - range of months (separated by a dash)
+if `echo $month | grep -q '-' >/dev/null`; then
+    # range of months
+    startmon=`echo $month | sed 's/-.*//'`
+    endmon=`echo $month | sed 's/.*-//'`
+    if `echo $startmon | grep -q '[^0-9]' >/dev/null`; then
+        convmon $startmon
+        startmon=$?
+    fi
+    if `echo $endmon | grep -q '[^0-9]' >/dev/null`; then
+        convmon $endmon
+        endmon=$?
+    fi
+    # We always start with the next occurrence of the month
+    curmon=`/bin/date "+%m"`
+    echo "comparing $curmon to $startmon"
+    if (( $curmon > $startmon )); then
+        ((year++))
+    fi
+    # the year applies to the starting month. Catch the case where
+    # we need to wrap the year
+    if [ "$startmon" -gt "$endmon" ]; then
+        for ((n=$startmon; n<=12; n++)); do
+            /usr/bin/cal $n $year
+        done
+        # start over again in Jan of the next year
+        startmon=1
+        ((year++))
+    fi
+    for ((n=$startmon; n<=$endmon; n++)); do
+        /usr/bin/cal $n $year
+    done
+else
+    # single month given; the case of just a single arg being a year
+    # was handled above, so we know that the month is a month and the
+    # year is a year
+    if `echo $month | grep -q '[^0-9]' >/dev/null`; then
+        convmon $month
+        month=$?
+    fi
+    # We always s tart with the next occurrence of the month
+    curmon=`/bin/date "+%m"`
+    echo "comparing $curmon to $month"
+    if (( $curmon > $month )); then
+        ((year++))
+    fi
+    /usr/bin/cal $month $year
+fi

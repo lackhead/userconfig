@@ -11,20 +11,70 @@
 ###########
 # Aliases #
 ###########
-
 alias pwds='gpg --decrypt ~clake/private/passes.gpg | less'
 alias h='history'
-alias ls='ls -F'
 alias rm='rm -i'
+alias git_branch='(command git symbolic-ref -q HEAD || command git name-rev --name-only --no-undefined --always HEAD) 2>/dev/null'
 # Mac specific stuff
 if [[ $(uname -s) == "Darwin" ]]; then
-   alias subl='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
-   alias update_mac_software='/usr/bin/sudo /usr/sbin/softwareupdate -ir --verbose'
+    alias subl='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
+    alias update_mac_software='/usr/bin/sudo /usr/sbin/softwareupdate -ir --verbose'
+    # let's use python3
+    if [ -x /usr/local/bin/python3 ]; then
+       alias python='/usr/local/bin/python3'
+       alias py='/usr/local/bin/python3'
+       alias pip='/usr/local/bin/pip3'
+    fi
+    # Flush DNS cache
+    alias flushdns="dscacheutil -flushcache"
+    # Recursively delete `.DS_Store` files
+    alias cleanup_dsstore="find . -name '*.DS_Store' -type f -ls -delete"
 fi
+# get ls to show in color
+# Always use color output for `ls`
+if ls --color > /dev/null 2>&1; then
+  alias ls ="ls -F --color"
+else
+  alias ls='ls -FG'
+fi
+# not an alias, but we're overriding a builtin so it makes sense to put it here
+function cd () {
+  builtin cd "$@" && ls
+}
 
 
-#################
-# Setting fpath #
-#################
+###############################
+# Setting fpath and functions #
+###############################
+fpath=( $HOME/.zsh/functions $HOME/.zsh/completions "${fpath[@]}" )
+autoload -Uz cal
+autoload -Uz backup
+autoload -Uz backup_laptop_to_disk
+autoload -Uz blogify
+autoload -Uz flac2mp3
+autoload -Uz kch
+autoload -Uz pathmunge
 
-fpath=( $HOME/.zsh_functions "${fpath[@]}" )
+
+##############
+# PATH stuff #
+##############
+# Note that Library/Python/3.6/bin is for homebrew installed python3 on MacOS
+for dir in ~/bin /usr/local/{s,}bin ~/Library/Python/3.6/bin ~/bin; do
+   if [[ -d $dir ]]; then
+      pathmunge $dir before
+   fi
+done
+
+
+################################
+# Set up environment variables #
+################################
+# Make less case-insensitive
+export LESS="-qeRiFX"
+
+# Tell git not to use my account creds for public repositories
+export HOMEBREW_NO_GITHUB_API=1
+
+
+
