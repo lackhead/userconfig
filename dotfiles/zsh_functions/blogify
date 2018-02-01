@@ -1,3 +1,0 @@
-for file in $*; do 
-   /usr/bin/sips -Z 800 -s format jpeg $file --out ${file%.*}.TN.jpg
-done
