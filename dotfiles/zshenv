@@ -8,6 +8,7 @@
 #########################################
 
 
+
 ###########
 # Aliases #
 ###########
@@ -43,17 +44,101 @@ function cd () {
 }
 
 
-###############################
-# Setting fpath and functions #
-###############################
-fpath=( $HOME/.zsh/functions $HOME/.zsh/completions "${fpath[@]}" )
-autoload -Uz cal
-autoload -Uz backup
-autoload -Uz backup_laptop_to_disk
-autoload -Uz blogify
-autoload -Uz flac2mp3
-autoload -Uz kch
-autoload -Uz pathmunge
+
+
+#############
+# functions #
+#############
+# turn images into thumbnails
+blogify() {
+   for file in $*; do
+      /usr/bin/sips -Z 800 -s format jpeg $file --out ${file%.*}.TN.jpg
+   done
+}
+
+# load up ssh keys
+kch() {
+   local kch=`type -p keychain`;
+   if [ -n "$kch" ]; then
+       $kch --host $HOST;
+       if [ -f ~/.keychain/${HOST}-sh ]; then
+           echo "Sourcing ~/.keychain/${HOST}-sh...";
+           . ~/.keychain/${HOST}-sh;
+           for key in lackhead_rsa;
+           do
+               if ! ssh-add -l | grep -q $key; then
+                   ssh-add $HOME/.ssh/$key;
+               fi;
+           done;
+       else
+           echo "No keychain host file found for $HOST.";
+       fi;
+   else
+       echo "keychain script was not found!";
+   fi
+}
+
+# add/remote a directory from PATH
+pathmunge() {
+   #
+   # pathmunge: add a new entry to the PATH variable
+   #
+   # Usage:
+   #   pathmunge <dir> [before]
+   #
+   #      This appends <dir> to the path array; if a second argument exists and is the string "before"
+   #      then <dir> is prepended instead of appended.
+   #
+   #   pathmunge -r <dir>
+   #
+   #      In this usage the directory is removed from the path if it exists.
+   #
+
+   # do we have anything to do?
+   if [[ $# -eq 0 ]]; then
+      return
+   fi
+
+   # Are we removing or not?
+   if [[ $1 == "-r" ]]; then
+      shift
+      local remove=1
+   fi
+
+   # make sure directory exists and is not already in PATH
+   # before adding it in.
+   local dirtoadd=$1
+   local position=$2
+   if [[ -d $dirtoadd ]]; then
+
+       # remove any previous occurrence of $dirtoadd
+       path=("${(@)path:#${dirtoadd}}")
+
+       # exit if that's all they wanted us to do
+       if [[ $remove -eq 1 ]]; then
+          return
+       fi
+
+       # add the new entry; note that I am using () expansion so that
+       # any null entries are removed (possibly created in the line above)
+       if [[ "$position" == "before" ]]; then
+          path=($dirtoadd $path)
+       else
+          path=($path $dirtoadd)
+       fi
+
+       # de-dupe just in case
+       typeset -gU path
+
+   else
+
+       echo "No such directory: $1"
+       return 1
+
+   fi
+}
+
+
 
 
 ##############
@@ -65,6 +150,8 @@ for dir in ~/bin /usr/local/{s,}bin ~/Library/Python/3.6/bin ~/bin; do
       pathmunge $dir before
    fi
 done
+
+
 
 
 ################################

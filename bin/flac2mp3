@@ -1,3 +1,8 @@
+#!/bin/bash
+
+#
+# convert flac files to MP3
+#
 
 for file in "$@"; do
 

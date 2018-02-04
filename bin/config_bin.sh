@@ -1,20 +1,15 @@
 #!/usr/bin/env bash
 #
-# This script installs the dotfiles I use for my shell(s) and
-# other things. The assumption is that all the files to be
-# installed will exist in the same directory as this script.
-# The destination is assumed to be the home directory of the
-# current user, although an optional argument of a directory
-# will install there instead. All files should exist WITHOUT
-# a dot prefix; one will be added by this script automatically.
-# In addition, any directories here will be created in the
-# destination directory (with a prepended .) and all files beneath
-# will be linked in as is.
+# This script installs the ~/bin directory which contains
+# scripts I've written. The assumption is that these files
+# will be symlinked from ~/bin from the same directory as this
+# script, although an optional argument of a directory
+# will install there instead.
 
 set -e
 
 # what directory are we working out of
-DOTFILES_ROOT=$(cd $(dirname $0) && pwd -P)
+BIN_ROOT=$(cd $(dirname $0) && pwd -P)
 
 # Global variables
 CMDS_RUN=0
@@ -139,7 +134,7 @@ while getopts "Bd:hOSt" opt $@; do
        echo "Usage: $(basename $0) [ -BOSt ] [ -d <dir> ]"
        echo ""
        echo "   -B   Backup all files/links that currently exist"
-       echo "   -d   Install into <dir> instead of ${HOME}"
+       echo "   -d   Install into <dir> instead of ${HOME}/bin"
        echo "   -O   overwrite all existing files without prompting"
        echo "   -S   Skip any existing files"
        echo "   -t   Test mode; show what would be done"
@@ -158,20 +153,37 @@ shift $((OPTIND - 1))
 # All files/directories that go in the dest should be prepended with a dot. Anything
 # further underneath that should be linked as is
 
-# create the directory structure
-if [ "$TEST" == "true" ]; then
-   ( cd ${DOTFILES_ROOT} && find . -mindepth 1 -type d ! -name . | sed 's:/::1' | xargs -n1 -I {} echo "  " /bin/mkdir -p ${DEST_HOME}/{} )
-else
-   ( cd ${DOTFILES_ROOT} && find . -mindepth 1 -type d ! -name . | sed 's:/::1' | xargs -n1 -I {} /bin/mkdir -p ${DEST_HOME}/{} )
+# create the bin directory if it doesn't exist
+if [ ! -d "${DEST_HOME}/bin" ]; then
+    if [[ ${TEST} == "true" ]]; then
+        echo "   /bin/mkdir ${DEST_HOME}/bin"
+    else
+        /bin/mkdir ${DEST_HOME}/bin
+    fi
 fi
 
-# do all base level files, skipping this script if it exists there
-for file in $( cd ${DOTFILES_ROOT} && find . -mindepth 1 -type f ! -name . ); do
+# create the directory structure
+if [ "$TEST" == "true" ]; then
+   ( cd ${BIN_ROOT} && find . -mindepth 1 -type d ! -name . | sed 's:/::1' | xargs -n1 -I {} echo "  " /bin/mkdir -p ${DEST_HOME}/{} )
+else
+   ( cd ${BIN_ROOT} && find . -mindepth 1 -type d ! -name . | sed 's:/::1' | xargs -n1 -I {} /bin/mkdir -p ${DEST_HOME}/{} )
+fi
+
+# for each item in this directory, link to the source
+for file in $( cd ${BIN_ROOT} && find . -mindepth 1 -type f ! -name . ); do
     if [[ $(basename $file) == $(basename $0) ]]; then
        continue
     fi
-    link_file ${DOTFILES_ROOT}/$(echo $file | sed 's:./::') ${DEST_HOME}/$(echo $file | sed 's:/::')
+    link_file ${BIN_ROOT}/$(echo $file | sed 's:^./::') ${DEST_HOME}/bin/$(echo $file | sed 's:^./::')
+    # force the right perms
+    if [ "$TEST" == "true" ]; then
+        echo "  " /bin/chmod 0755 ${DEST_HOME}/bin/$(echo $file | sed 's:^./::')
+    else
+        /bin/chmod -v 0755 ${DEST_HOME}/bin/$(echo $file | sed 's:^./::')
+    fi
 done
+
+
 
 # Exit out
 if [[ ${TEST} == "true" ]]; then

@@ -1,3 +1,9 @@
+#!/bin/bash
+
+#
+# This script will backup my laptop to an attached physical disk
+#
+
 backup_dir="/Volumes/Long Term Storage/clake"
 
 # make sure destination dir exists

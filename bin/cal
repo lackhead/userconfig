@@ -16,7 +16,7 @@ function convmon ()
         "oct") return 10 ;;
         "nov") return 11 ;;
         "dec") return 12 ;;
-        *) echo "$mon not recognized as a month." >&2 && exit 1
+        *) return -1 ;;
     esac
 }
 
@@ -62,14 +62,18 @@ if `echo $month | grep -q '-' >/dev/null`; then
     # range of months
     startmon=`echo $month | sed 's/-.*//'`
     endmon=`echo $month | sed 's/.*-//'`
+    # error if either is missing
+    if [ -z "$startmon" -o -z "$endmon" ]; then
+        echo "Invalid date range: $month"
+        return 1
+    fi
     if `echo $startmon | grep -q '[^0-9]' >/dev/null`; then
-        convmon $startmon
-        startmon=$?
+        convmon $startmon && startmon=$?
     fi
     if `echo $endmon | grep -q '[^0-9]' >/dev/null`; then
-        convmon $endmon
-        endmon=$?
+        convmon $endmon && endmon=$?
     fi
+
     # We always start with the next occurrence of the month
     curmon=`/bin/date "+%m"`
     if (( $curmon > $startmon )); then
@@ -93,8 +97,7 @@ else
     # was handled above, so we know that the month is a month and the
     # year is a year
     if `echo $month | grep -q '[^0-9]' >/dev/null`; then
-        convmon $month
-        month=$?
+        convmon $month && month=$?
     fi
     # We always start with the next occurrence of the month
     # if no specific year was specified; UNLESS the year was

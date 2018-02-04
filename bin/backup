@@ -1,3 +1,9 @@
+#!/bin/bash
+
+#
+# This script will make a backup of a server into the configured backup_dir
+#
+
 backup_dir="/Users/clake/backups"
 
 # First arg is hostname...make it an FQDN in lackhead.org space

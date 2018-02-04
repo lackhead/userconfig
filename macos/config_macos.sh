@@ -13,7 +13,7 @@
 osascript -e 'tell application "System Preferences" to quit'
 
 # Ask for the administrator password upfront
-/usr/bin/sudo -v
+# /usr/bin/sudo -v
 
 #######################################################
 # General Options                                     #
@@ -41,9 +41,6 @@ echo "Setting Time Machine preferences"
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
-# Disable local Time Machine backups
-hash tmutil &> /dev/null && sudo tmutil disablelocal
-
 
 #######################################################
 # Trackpad.                                           #
@@ -61,7 +58,10 @@ echo "Setting Finder preferences"
 
 # Show the ~/Library and /Volumes folders
 chflags nohidden ~/Library
-sudo chflags nohidden /Volumes
+# only call to sudo if need be
+ if ! ls -aOld /Volumes | /usr/bin/grep -q nohidden; then
+   sudo chflags nohidden /Volumes
+fi
 
 # Set the Finder prefs for showing a few different volumes on the Desktop.
 /usr/bin/defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
