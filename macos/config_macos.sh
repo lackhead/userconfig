@@ -29,8 +29,11 @@ echo "Setting general options"
 # Set a really fast key repeat.
 /usr/bin/defaults write NSGlobalDomain KeyRepeat -int 2
 
-# set shell to zsh
-/usr/bin/chsh -s /bin/zsh
+# set shell to zsh if necessary
+if [ `/usr/bin/dscl . -read /Users/$(/usr/bin/id -un) UserShell | awk '{ print $2 }'` != "/bin/zsh" ]; then
+    /usr/bin/chsh -s /bin/zsh
+fi
+
 
 
 #######################################################
@@ -59,7 +62,7 @@ echo "Setting Finder preferences"
 # Show the ~/Library and /Volumes folders
 chflags nohidden ~/Library
 # only call to sudo if need be
- if ! ls -aOld /Volumes | /usr/bin/grep -q nohidden; then
+if ! ls -aOld /Volumes | /usr/bin/grep -q nohidden; then
    sudo chflags nohidden /Volumes
 fi
 
@@ -138,7 +141,7 @@ defaults write com.apple.digihub com.apple.digihub.dvd.video.appeared -dict acti
 
 
 #######################################################
-# CD/DVD                                              #
+# PHOTOS                                              #
 #######################################################
 echo "Setting Photos preferences"
 
@@ -164,9 +167,20 @@ defaults write com.apple.dock autohide-delay -float 0
 defaults write com.apple.dock showhidden -bool true
 
 
+#######################################################
+# iterm2                                              #
+#######################################################
+echo "Configuring defaults for iterm2"
+
+# Specify the preferences directory
+defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "`dirname $0`/iterm2"
+
+# Tell iTerm2 to use the custom preferences in the directory
+defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true
+
+
 
 #######################################################
 # We're done                                          #
 #######################################################
 echo "Customization complete."
-echo "Note that some of these changes require a logout/restart to take effect."
