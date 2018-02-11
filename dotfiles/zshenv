@@ -15,9 +15,11 @@
 alias pwds='gpg --decrypt ~clake/private/passes.gpg | less'
 alias h='history'
 alias rm='rm -i'
+alias ls='ls -F'
 alias git_branch='(command git symbolic-ref -q HEAD || command git name-rev --name-only --no-undefined --always HEAD) 2>/dev/null'
 # Mac specific stuff
 if [[ $(uname -s) == "Darwin" ]]; then
+    alias ls='ls -FG'
     alias subl='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
     alias update_mac_software='/usr/bin/sudo /usr/sbin/softwareupdate -ir --verbose'
     # let's use python3
@@ -30,13 +32,6 @@ if [[ $(uname -s) == "Darwin" ]]; then
     alias flushdns="dscacheutil -flushcache"
     # Recursively delete `.DS_Store` files
     alias cleanup_dsstore="find . -name '*.DS_Store' -type f -ls -delete"
-fi
-# get ls to show in color
-# Always use color output for `ls`
-if ls --color > /dev/null 2>&1; then
-  alias ls ="ls -F --color"
-else
-  alias ls='ls -FG'
 fi
 # not an alias, but we're overriding a builtin so it makes sense to put it here
 function cd () {
