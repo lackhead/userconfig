@@ -67,8 +67,13 @@ if ! `echo $arg | grep -q '-' >/dev/null`; then
         exit
     else
         # ah, so we have a month
-        # default to current year
-        year=${year-`/bin/date "+%Y"`}
+        #  - if already given a year, we know what to do
+        if [ ! -z "$year" ]; then
+           /usr/bin/cal -m ${arg} ${year}
+           exit
+        fi
+        #  - if we don't have a year, default to current year
+        year=`/bin/date "+%Y"`
         # and we always start with the next occurrence of the starting month
         curmon=`/bin/date "+%m"`
         if (( $curmon > $arg )); then
@@ -90,7 +95,7 @@ fi
 
 # make sure they get converted to numbers
 startmon=$(conv_to_num $startmon)
-if $?; then
+if [ ! $? -eq 0 ]; then
    exit $?
 fi
 endmon=$(conv_to_num $endmon)
@@ -105,12 +110,14 @@ if [ ! $? -eq 0 ]; then
    exit $?
 fi
 
-# default to current year
-year=${year-`/bin/date "+%Y"`}
-# and we always start with the next occurrence of the starting month
-curmon=`/bin/date "+%m"`
-if (( $curmon > $startmon )); then
-    ((year++))
+# Fill in the year if needed
+if [ -z ${year} ]; then
+   year=`/bin/date "+%Y"`
+   # and we always start with the next occurrence of the starting month
+   curmon=`/bin/date "+%m"`
+   if (( $curmon > $startmon )); then
+       ((year++))
+   fi
 fi
 
 # figure out how many months we need to print out
