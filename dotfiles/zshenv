@@ -139,7 +139,7 @@ pathmunge() {
 # PATH stuff #
 ##############
 # Note that Library/Python/3.6/bin is for homebrew installed python3 on MacOS
-for dir in /usr/local/{s,}bin ~/Library/Python/3.6/bin ~/bin; do
+for dir in /usr/local/linkedin/bin /usr/local/{s,}bin ~/Library/Python/3.6/bin ~/bin; do
    if [[ -d $dir ]]; then
       pathmunge $dir before
    fi
