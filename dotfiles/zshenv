@@ -37,6 +37,11 @@ function cd () {
   builtin cd "$@" && ls
 }
 
+## LinkedIn aliases
+function myorg () {
+   /usr/local/linkedin/bin/inchart -c - clake | tail +2 | cut -d, -f 3  | perl -ne 'chomp; push @foo,$_; END { print join(",",@foo), "\n"; }'
+}
+
 
 
 
