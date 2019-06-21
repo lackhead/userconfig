@@ -39,8 +39,7 @@ function cd () {
 
 ## LinkedIn aliases
 function myorg () {
-   user=$1
-   /usr/local/linkedin/bin/inchart -c - ${user:-clake} | tail +2 | cut -d, -f 3  | perl -ne 'chomp; push @foo,$_; END { print join(",",@foo), "\n"; }'
+   /usr/local/linkedin/bin/inchart -c - ${1:-clake} | tail +2 | cut -d, -f 3  | perl -ne 'chomp; push @foo,$_; END { print join(",",@foo), "\n"; }'
 }
 
 
