@@ -34,7 +34,6 @@ brew "unrar"
 brew "wget"
 brew "youtube-dl"
 
-cask '1password'
 cask 'android-file-transfer'
 cask 'backblaze'
 cask 'backblaze-downloader'
@@ -51,5 +50,4 @@ cask 'slack'
 cask 'spotify'
 cask 'sublime-text'
 cask 'swinsian'
-cask 'tunnelblick'
 cask 'vlc'
