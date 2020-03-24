@@ -39,7 +39,28 @@ function cd () {
 
 ## LinkedIn aliases
 function myorg () {
-   /usr/local/linkedin/bin/inchart -X -c - ${1:-clake} | tail +2 | cut -d, -f 3  | perl -ne 'chomp; push @foo,$_; END { print join(", ",@foo), "\n"; }'
+
+   local join_str=" "
+
+   while getopts ':e' arg; do
+      case $arg in 
+         e)  join_str="@linkedin.com; " ;; 
+         \?) print "Usage: $0 [ username ] [ -e ]" && exit 1 ;;
+      esac
+   done
+   shift $OPTIND-1 
+
+   users=$(/usr/local/linkedin/bin/inchart -X -c - ${1:-clake} | tail +2 | cut -d, -f 3)
+
+   local IFS=$'\n'
+   if [ $ZSH_VERSION ]; then
+      setopt sh_word_split
+   fi
+   for user in $users; do
+      echo -n "${user}${join_str}"
+   done
+   echo
+
 }
 
 
