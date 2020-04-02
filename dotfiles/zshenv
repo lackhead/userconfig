@@ -45,7 +45,7 @@ function myorg () {
    while getopts ':e' arg; do
       case $arg in 
          e)  join_str="@linkedin.com; " ;; 
-         \?) print "Usage: $0 [ username ] [ -e ]" && exit 1 ;;
+         \?) print "Usage: $0 [ username ] [ -e ]" && return;;
       esac
    done
    shift $OPTIND-1 
