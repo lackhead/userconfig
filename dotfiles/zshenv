@@ -8,6 +8,13 @@
 #########################################
 
 
+
+###########
+# Options #
+###########
+setopt magicequalsubst     # enable filename expansion for arguments of the form ‘anything=expression’
+
+
 ###########
 # Aliases #
 ###########
@@ -38,33 +45,6 @@ function cd () {
   builtin cd "$@" && ls
 }
 
-## LinkedIn aliases
-function myorg () {
-
-   local join_str=" "
-
-   while getopts ':e' arg; do
-      case $arg in 
-         e)  join_str="@linkedin.com; " ;; 
-         \?) print "Usage: $0 [ username ] [ -e ]" && return;;
-      esac
-   done
-   shift $OPTIND-1 
-
-   users=$(/usr/local/linkedin/bin/inchart -X -c - ${1:-clake} | tail +2 | cut -d, -f 3)
-
-   local IFS=$'\n'
-   if [ $ZSH_VERSION ]; then
-      setopt sh_word_split
-   fi
-   for user in $users; do
-      echo -n "${user}${join_str}"
-   done
-   echo
-
-}
-
-
 
 
 #############
@@ -77,27 +57,26 @@ blogify() {
    done
 }
 
-# load up ssh keys
+
+# Get ssh-agent running
+# NOTE: this isn't don't automatically as I don't want agents floating around 
+#       everywhere- an agent will only be started specifically when I start one.
+#       BUT- if I land on a host where an agent is running, it should connect 
+#       automatically (hence, source the keychain file if it exists) 
+# NOTE: include AddKeysToAgent in ~/.ssh/config to have them automatically added 
+#       to the agent upon first use
 kch() {
-   local kch=`type -p keychain`;
-   if [ -n "$kch" ]; then
-       $kch --host $HOST;
-       if [ -f ~/.keychain/${HOST}-sh ]; then
-           echo "Sourcing ~/.keychain/${HOST}-sh...";
-           . ~/.keychain/${HOST}-sh;
-           for key in lackhead_rsa;
-           do
-               if ! ssh-add -l | grep -q $key; then
-                   ssh-add $HOME/.ssh/$key;
-               fi;
-           done;
-       else
-           echo "No keychain host file found for $HOST.";
-       fi;
-   else
-       echo "keychain script was not found!";
-   fi
+   local keychain=$( type -p keychain | awk '{ print $NF }');
+   ${keychain} --host ${HOST} 
+   if [ -f ~/.keychain/${HOST}-sh ]; then
+      source ~/.keychain/${HOST}-sh;
+   fi 
 }
+# to be run on every shell instance
+if [ -f ~/.keychain/${HOST}-sh ]; then
+   source ~/.keychain/${HOST}-sh;
+fi
+
 
 # add/remote a directory from PATH
 pathmunge() {
