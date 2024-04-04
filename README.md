@@ -10,7 +10,7 @@ needs to be run once per user.
 
 ## config_dotfiles.sh
 
-This installs a sparse git repo which is how I keep my dot-files in line. Please see http://www.github.com/lackhead/dotfiles repo for the files themselves.
+This installs a sparse git repo which is how I keep my dot-files in line. Please see my [dotfiles](http://www.github.com/lackhead/dotfiles) repo for the files themselves.
 
 ## config_homebrew.sh
 
